@@ -8,7 +8,7 @@ INCLUDE = includes
 
 SRCS = \
 	srcs/actions.c \
-	srcs/check_dead.c \
+	srcs/check_death.c \
 	srcs/init_simulation.c \
 	srcs/parsing.c \
 	srcs/philo_utils.c \

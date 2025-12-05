@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:48:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/04 16:33:27 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/05 05:05:04 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 static int	even_philo(t_philo *philo)
 {
 	pthread_mutex_lock(philo->r_fork);
-	if (!print_status(philo, "has taken a fork", philo->start_sim))
+	if (!print_status(philo, "has taken a fork"))
 		return (pthread_mutex_unlock(philo->r_fork), 0);
 	pthread_mutex_lock(philo->l_fork);
-	if (!print_status(philo, "has taken a fork", philo->start_sim))
+	if (!print_status(philo, "has taken a fork"))
 		return (pthread_mutex_unlock(philo->r_fork),
 				pthread_mutex_unlock(philo->l_fork), 0);
-	if (!print_status(philo, "is eating", philo->start_sim))
+	if (!print_status(philo, "is eating"))
 		return (pthread_mutex_unlock(philo->r_fork),
 				pthread_mutex_unlock(philo->l_fork), 0);
 	pthread_mutex_lock(&philo->last_meal);
@@ -40,15 +40,15 @@ static int	even_philo(t_philo *philo)
 static int	odd_philo(t_philo *philo)
 {
 	pthread_mutex_lock(philo->l_fork);
-	if (!print_status(philo, "has taken a fork", philo->start_sim))
+	if (!print_status(philo, "has taken a fork"))
 		return (pthread_mutex_unlock(philo->l_fork), 0);
 	if (philo->table->philo_count == 1)
 		return (pthread_mutex_unlock(philo->l_fork), 0);
 	pthread_mutex_lock(philo->r_fork);
-	if (!print_status(philo, "has taken a fork", philo->start_sim))
+	if (!print_status(philo, "has taken a fork"))
 		return (pthread_mutex_unlock(philo->l_fork),
 				pthread_mutex_unlock(philo->r_fork), 0);
-	if (!print_status(philo, "is eating", philo->start_sim))
+	if (!print_status(philo, "is eating"))
 		return (pthread_mutex_unlock(philo->l_fork),
 				pthread_mutex_unlock(philo->r_fork), 0);
 	pthread_mutex_lock(&philo->last_meal);
@@ -75,8 +75,9 @@ void	*philo_routine(void *data)
 		usleep(100);
 	while (1)
 	{
-		if (!print_status(philo, "is thinking", philo->start_sim))
+		if (!print_status(philo, "is thinking"))
 			return (NULL);
+		usleep(500);
 		if (philo->philo_id % 2 == 1)
 		{
 			if (!odd_philo(philo))
@@ -87,10 +88,9 @@ void	*philo_routine(void *data)
 			if (!even_philo(philo))
 				return (NULL);
 		}
-		if (!print_status(philo, "is sleeping", philo->start_sim))
+		if (!print_status(philo, "is sleeping"))
 			return (NULL);
 		ft_usleep(philo->tt_sleep, philo);
 	}
 	return (NULL);
 }
-

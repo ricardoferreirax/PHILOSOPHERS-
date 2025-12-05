@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:44:44 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/04 16:33:56 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/05 05:05:53 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,20 +38,21 @@ void	ft_usleep(long long duration, t_philo *philo)
 	}
 }
 
-int	print_status(t_philo *philo, const char *text, long long start_sim)
+int	print_status(t_philo *philo, const char *msg)
 {
-	long long	current;
+	long long	now;
 
-	current = current_time_ms();
 	pthread_mutex_lock(&philo->table->death_lock);
-	if (philo->table->someone_died == 1)
+	if (philo->table->someone_died)
 	{
 		pthread_mutex_unlock(&philo->table->death_lock);
 		return (0);
 	}
 	pthread_mutex_unlock(&philo->table->death_lock);
 	pthread_mutex_lock(&philo->table->print_lock);
-	printf("%lld %d %s\n", current - start_sim, philo->philo_id, text);
+	now = current_time_ms();
+	if (!philo->table->someone_died)
+		printf("%lld %d %s\n", now - philo->start_sim, philo->philo_id, msg);
 	pthread_mutex_unlock(&philo->table->print_lock);
 	return (1);
 }

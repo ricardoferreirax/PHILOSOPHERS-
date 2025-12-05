@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:45:49 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/04 16:33:50 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/05 05:09:34 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,15 @@ static int	validate_numbers(int ac, char **av)
 		if (av[i][j] == '-' || av[i][j] == '0')
 			return (printf("Error: arguments cannot be negative or zero\n"), 0);
 		if (av[i][j] == '+')
+		{
 			j++;
+			if (!av[i][j])
+				return (printf("Error: '+' must be followed by digits\n"), 0);
+		}
 		while (av[i][j])
 		{
 			if (!ft_isdigit(av[i][j]))
-				return (printf("Error: all arguments must be digitsc\n"), 0);
+				return (printf("Error: all arguments must be digits\n"), 0);
 			j++;
 		}
 		if (!is_valid_int(av[i]))

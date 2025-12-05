@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:59:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/04 16:33:42 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/05 05:05:34 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static void	init_philos(t_sim *sim, t_philo *philos)
 		philos[i].r_fork = &sim->forks[(i + 1) % sim->philo_count];
 		philos[i].start_sim = sim->start_sim;
 		philos[i].last_meal_time = sim->start_sim;
+		philos[i].meals_eaten = 0;
 		philos[i].table = sim;
 		pthread_mutex_init(&philos[i].last_meal, NULL);
 		pthread_mutex_init(&philos[i].meal_count, NULL);
@@ -37,7 +38,7 @@ static void	init_philos(t_sim *sim, t_philo *philos)
 void	init_simulation(t_sim *sim)
 {
 	t_philo	*philo_arr;
-	int				i;
+	int		i;
 
 	pthread_mutex_init(&sim->print_lock, NULL);
 	pthread_mutex_init(&sim->death_lock, NULL);
@@ -52,8 +53,7 @@ void	init_simulation(t_sim *sim)
 	i = 0;
 	while (i < sim->philo_count)
 	{
-		if (pthread_create(&philo_arr[i].thread_id, NULL,
-				philo_routine, &philo_arr[i]))
+		if (pthread_create(&philo_arr[i].thread_id, NULL, philo_routine, &philo_arr[i]))
 		{
 			sim->someone_died = 1;
 			return ;
