@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:51:12 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/05 19:46:35 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/11 15:22:40 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/time.h>
 # include <pthread.h>
 
+typedef struct s_philo t_philo;
 typedef struct s_sim t_sim;
 typedef pthread_mutex_t t_mutex;
 
@@ -58,7 +59,8 @@ typedef struct s_sim
 int	print_status(t_philo *philo, const char *msg);
 long long	current_time_ms(void);
 void	ft_usleep(long long duration, t_philo *philo);
-void	init_simulation(t_sim *sim);
+void cleanup_simulation(t_sim *sim, int created_threads);
+int		init_simulation(t_sim *sim);
 void	*philo_routine(void *data);
 void	*death_monitor(void *data);
 int	validate_args(int ac, char **av, t_sim *sim);

@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:49:15 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/05 14:56:13 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/11 15:34:32 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,28 +51,14 @@ int	validate_args(int ac, char **av, t_sim *sim)
 int	main(int ac, char **av)
 {
 	t_sim	sim;
-	int		i;
 
 	sim.start_sim = current_time_ms() + 500;
 	if (ac != 5 && ac != 6)
 		return (show_usage_error(), 1);
 	if (!validate_args(ac, av, &sim))
 		return (1);
-	init_simulation(&sim);
-	i = 0;
-	while (i < sim.philo_count)
-		pthread_join(sim.philos[i++].thread_id, NULL);
-	pthread_join(sim.death_monitor, NULL); 
-	pthread_mutex_destroy(&sim.death_lock); 
-	pthread_mutex_destroy(&sim.print_lock); 
-	i = 0;
-	while (i < sim.philo_count)
-	{
-		pthread_mutex_destroy(&sim.philos[i].last_meal); 
-		pthread_mutex_destroy(&sim.philos[i].meal_count); 
-		pthread_mutex_destroy(&sim.forks[i++]); 
-	}
-	free(sim.philos);
-	free(sim.forks);
+	if (!init_simulation(&sim))
+		return (1);
+	cleanup_simulation(&sim, sim.philo_count);
 	return (0);
 }

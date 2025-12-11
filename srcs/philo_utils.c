@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:44:44 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/05 05:05:53 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/11 15:50:32 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,32 @@ void	ft_usleep(long long duration, t_philo *philo)
 	}
 }
 
+void    cleanup_simulation(t_sim *sim, int created_threads)
+{
+    int i;
+
+    i = 0;
+    while (i < created_threads)
+    {
+        pthread_join(sim->philos[i].thread_id, NULL);
+        i++;
+    }
+    if (created_threads == sim->philo_count)
+        pthread_join(sim->death_monitor, NULL);
+    i = 0;
+    while (i < sim->philo_count)
+    {
+        pthread_mutex_destroy(&sim->forks[i]);
+        pthread_mutex_destroy(&sim->philos[i].last_meal);
+        pthread_mutex_destroy(&sim->philos[i].meal_count);
+        i++;
+    }
+    pthread_mutex_destroy(&sim->print_lock);
+    pthread_mutex_destroy(&sim->death_lock);
+    free(sim->philos);
+    free(sim->forks);
+}
+	
 int	print_status(t_philo *philo, const char *msg)
 {
 	long long	now;
