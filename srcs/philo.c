@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:49:15 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:33:08 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:56:22 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int	validate_args(t_sim *table, int ac, char **av)
 	table->forks = ft_calloc(table->philo_count, sizeof(t_mutex));
 	if (!table->forks)
 		return (cleanup_and_error(table, "Malloc Failed\n", 0));
-	if (!setup_aux(table))
+	if (!init_mutexes(table))
 		return (0);
 	table->start_sim = current_timestamp();
 	return (1);
@@ -62,7 +62,6 @@ int	main(int ac, char **av)
 	t_sim	table;
 	int		i;
 
-	i = -1;
 	if (ac != 5 && ac != 6)
 	{
 		show_usage_error();
@@ -73,13 +72,15 @@ int	main(int ac, char **av)
 		ft_putstr_fd("Error: invalid arguments\n", 2);
 		return (1);
 	}
-	if (!character_creation(&table))
+	if (!init_philos(&table))
 		return (1);
-	while (++i < table.philo_count)
+	i = 0;
+	while (i < table.philo_count)
 	{
 		pthread_create(&table.philos[i].thread_id, NULL, philo_routine,
 			&table.philos[i]);
+		i++;
 	}
-	pthread_life(&table);
+	end_simulation(&table);
 	return (0);
 }

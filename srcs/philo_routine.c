@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:48:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:32:02 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:44:45 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,19 +44,12 @@ int	philo_pick_forks(t_philo *philo)
 		pthread_mutex_lock(philo->l_fork);
 		philo_print_state(philo, "has taken a fork");
 		philo_usleep(philo->table->tt_die * 2, philo->table);
-		return (pthread_mutex_unlock(philo->l_fork), 0);
+		pthread_mutex_unlock(philo->l_fork);
+		return (0);
 	}
-	if (philo->philo_id % 2 != 0)
-		pthread_mutex_lock(philo->l_fork);
-	else
-		pthread_mutex_lock(philo->r_fork);
-	philo_print_state(philo, "has taken a fork");
-	if (philo->philo_id % 2 != 0)
-		pthread_mutex_lock(philo->r_fork);
-	else
-		pthread_mutex_lock(philo->l_fork);
-	philo_print_state(philo, "has taken a fork");
-	return (1);
+	if (philo->philo_id % 2 == 0)
+		return (pick_forks_even(philo));
+	return (pick_forks_odd(philo));
 }
 
 void	philo_eat(t_philo *philo)
@@ -75,23 +68,17 @@ void	philo_eat(t_philo *philo)
 		{
 			pthread_mutex_unlock(&philo->meal_count);
 			pthread_mutex_lock(&philo->table->full_lock);
-			philo->table->full_philos += 1;
+			philo->table->full_philos++;
 			pthread_mutex_unlock(&philo->table->full_lock);
 		}
 		else
 			pthread_mutex_unlock(&philo->meal_count);
 	}
 	philo_usleep(philo->table->tt_eat, philo->table);
-	if (philo->philo_id % 2 != 0)
-	{
-		pthread_mutex_unlock(philo->l_fork);
-		pthread_mutex_unlock(philo->r_fork);
-	}
+	if (philo->philo_id % 2 == 0)
+		unlock_forks_even(philo);
 	else
-	{
-		pthread_mutex_unlock(philo->r_fork);
-		pthread_mutex_unlock(philo->l_fork);
-	}
+		unlock_forks_odd(philo);
 }
 
 void	*philo_routine(void *arg)

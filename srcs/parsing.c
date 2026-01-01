@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:45:49 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:11:53 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:46:42 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static int	ft_isnegative(const char *arg)
 
 static int	ft_iszero(const char *arg)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (arg[i] == '+')
@@ -41,7 +41,7 @@ static int	ft_iszero(const char *arg)
 
 static int	ft_alldigits(const char *arg)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (arg[i] == '+')
@@ -65,8 +65,7 @@ static int	validate_int_limit(const char *str)
 	len = 0;
 	while (str[len])
 		len++;
-	if ((len == 10 && ft_strncmp(str, "2147483647", 10) > 0)
-		|| len > 10)
+	if ((len == 10 && ft_strncmp(str, "2147483647", 10) > 0) || len > 10)
 	{
 		printf("Error: argument exceeds integer limit\n");
 		return (0);
@@ -74,22 +73,22 @@ static int	validate_int_limit(const char *str)
 	return (1);
 }
 
-int validate_numbers(int ac, char **av)
+int	validate_numbers(int ac, char **av)
 {
-    int i;
+	int	i;
 
-    i = 1;
-    while (i < ac)
-    {
-        if (!ft_isnegative(av[i]))
-            return (0);
-        if (!ft_iszero(av[i]))
-            return (0);
-        if (!ft_alldigits(av[i]))
-            return (0);
-        if (!validate_int_limit(av[i]))
-            return (0);
-        i++;
-    }
-    return (1);
+	i = 1;
+	while (i < ac)
+	{
+		if (!ft_isnegative(av[i]))
+			return (0);
+		if (!ft_iszero(av[i]))
+			return (0);
+		if (!ft_alldigits(av[i]))
+			return (0);
+		if (!validate_int_limit(av[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }

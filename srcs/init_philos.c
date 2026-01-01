@@ -6,43 +6,40 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:59:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:21:37 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:52:42 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void pthread_life(t_sim *table)
+void	end_simulation(t_sim *table)
 {
-    int i;
+	int	i;
 
-    pthread_create(&table->death_monitor, NULL, monitor, table);
-    pthread_join(table->death_monitor, NULL);
-
-    i = 0;
-    while (i < table->philo_count)
-    {
-        pthread_join(table->philos[i].thread_id, NULL);
-        i++;
-    }
-
-    i = 0;
-    while (i < table->philo_count)
-    {
-        pthread_mutex_destroy(&table->forks[i]);
-        pthread_mutex_destroy(&table->philos[i].last_meal);
-        pthread_mutex_destroy(&table->philos[i].meal_count);
-        i++;
-    }
-    pthread_mutex_destroy(&table->print_lock);
-    pthread_mutex_destroy(&table->death_lock);
-    pthread_mutex_destroy(&table->full_lock);
-
-    free(table->forks);
-    free(table->philos);
+	pthread_create(&table->death_monitor, NULL, monitor, table);
+	pthread_join(table->death_monitor, NULL);
+	i = 0;
+	while (i < table->philo_count)
+	{
+		pthread_join(table->philos[i].thread_id, NULL);
+		i++;
+	}
+	i = 0;
+	while (i < table->philo_count)
+	{
+		pthread_mutex_destroy(&table->forks[i]);
+		pthread_mutex_destroy(&table->philos[i].last_meal);
+		pthread_mutex_destroy(&table->philos[i].meal_count);
+		i++;
+	}
+	pthread_mutex_destroy(&table->print_lock);
+	pthread_mutex_destroy(&table->death_lock);
+	pthread_mutex_destroy(&table->full_lock);
+	free(table->forks);
+	free(table->philos);
 }
 
-int	setup_aux(t_sim *table)
+int	init_mutexes(t_sim *table)
 {
 	int	i;
 
@@ -70,7 +67,7 @@ int	setup_aux(t_sim *table)
 	return (1);
 }
 
-int	character_creation(t_sim *table)
+int	init_philos(t_sim *table)
 {
 	int	id;
 

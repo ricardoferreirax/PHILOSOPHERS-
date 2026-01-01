@@ -9,7 +9,8 @@ INCLUDE = includes
 SRCS = \
 	srcs/philo_routine.c \
 	srcs/check_death.c \
-	srcs/init_simulation.c \
+	srcs/init_philos.c \
+	srcs/philo_forks.c \
 	srcs/parsing.c \
 	srcs/cleanup.c \
 	srcs/philo_utils.c \

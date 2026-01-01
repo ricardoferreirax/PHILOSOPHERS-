@@ -6,20 +6,20 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:51:12 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:32:41 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:57:11 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <limits.h>
 # include <pthread.h>
+# include <stdint.h>
 # include <stdio.h>
+# include <stdlib.h>
 # include <sys/time.h>
 # include <unistd.h>
-# include <stdlib.h>
-# include <limits.h>
-# include <stdint.h>
 
 typedef pthread_mutex_t	t_mutex;
 
@@ -41,13 +41,13 @@ typedef struct s_philo
 typedef struct s_sim
 {
 	int					philo_count;
-	int eat_count;
+	int					eat_count;
 	int					someone_died;
 	long				tt_sleep;
 	long				tt_die;
 	long				tt_eat;
 	long long			start_sim;
-	int full_philos;
+	int					full_philos;
 	t_mutex				*forks;
 	t_mutex				death_lock;
 	t_mutex				print_lock;
@@ -56,27 +56,29 @@ typedef struct s_sim
 	t_philo				*philos;
 }						t_sim;
 
-void	*philo_routine(void *arg);
-void philo_usleep(long duration, t_sim *table);
-long current_timestamp(void);
-int	cleanup_and_error(t_sim *table, char *str, int code);
-void dinner_time(t_philo *philo);
-int pick_forks(t_philo *philo);
-void philo_activity(t_philo *philo, char *s);
-int character_creation(t_sim *table);
-int setup_aux(t_sim *table);
-void pthread_life(t_sim *table);
-void	*monitor(void *arg);
+void					*philo_routine(void *arg);
+void					philo_usleep(long duration, t_sim *table);
+long					current_timestamp(void);
+int						cleanup_and_error(t_sim *table, char *str, int code);
+void					philo_print_state(t_philo *philo, char *s);
+int						init_philos(t_sim *table);
+int						init_mutexes(t_sim *table);
+void					end_simulation(t_sim *table);
+void					*monitor(void *arg);
 
+int						pick_forks_even(t_philo *philo);
+int						pick_forks_odd(t_philo *philo);
+void					unlock_forks_odd(t_philo *philo);
+void					unlock_forks_even(t_philo *philo);
 
 int						validate_numbers(int ac, char **av);
 
 int						ft_isdigit(int c);
 int						ft_strncmp(const char *s1, const char *s2, size_t n);
-long	ft_atol(const char *str);
+long					ft_atol(const char *str);
 void					ft_putstr_fd(char *s, int fd);
-void	ft_bzero(void *str, size_t n);
-void	*ft_memset(void *s, int c, size_t n);
-void	*ft_calloc(size_t nmemb, size_t size);
+void					ft_bzero(void *str, size_t n);
+void					*ft_memset(void *s, int c, size_t n);
+void					*ft_calloc(size_t nmemb, size_t size);
 
 #endif
