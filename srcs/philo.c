@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:49:15 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:23:38 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:33:08 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int	main(int ac, char **av)
 		return (1);
 	while (++i < table.philo_count)
 	{
-		pthread_create(&table.philos[i].thread_id, NULL, playthrough,
+		pthread_create(&table.philos[i].thread_id, NULL, philo_routine,
 			&table.philos[i]);
 	}
 	pthread_life(&table);

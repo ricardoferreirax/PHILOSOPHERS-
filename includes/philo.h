@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:51:12 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:22:23 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:32:41 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ typedef struct s_sim
 	t_philo				*philos;
 }						t_sim;
 
-void *playthrough(void *arg);
+void	*philo_routine(void *arg);
 void philo_usleep(long duration, t_sim *table);
 long current_timestamp(void);
 int	cleanup_and_error(t_sim *table, char *str, int code);
