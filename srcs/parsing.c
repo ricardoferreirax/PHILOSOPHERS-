@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:45:49 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/05 14:57:07 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:11:53 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,22 +74,22 @@ static int	validate_int_limit(const char *str)
 	return (1);
 }
 
-int	validate_numbers(int ac, char **av)
+int validate_numbers(int ac, char **av)
 {
-	int	i;
+    int i;
 
-	i = 1;
-	while (i < ac)
-	{
-		if (!ft_isnegative(av[i]))
-			return (0);
-		if (!ft_iszero(av[i]))
-			return (0);
-		if (!ft_alldigits(av[i]))
-			return (0);
-		if (!validate_int_limit(av[i]))
-			return (0);
-		i++;
-	}
-	return (1);
+    i = 1;
+    while (i < ac)
+    {
+        if (!ft_isnegative(av[i]))
+            return (0);
+        if (!ft_iszero(av[i]))
+            return (0);
+        if (!ft_alldigits(av[i]))
+            return (0);
+        if (!validate_int_limit(av[i]))
+            return (0);
+        i++;
+    }
+    return (1);
 }

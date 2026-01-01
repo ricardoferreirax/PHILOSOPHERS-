@@ -6,120 +6,84 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:04:07 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/13 16:36:09 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:02:41 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static int	philo_has_died(t_sim *sim, int i)
+void print_death(t_sim *table, int id, long now)
 {
-	long long	now;
-	long long	last_meal;
-	int			meals;
+    pthread_mutex_lock(&table->print_lock);
+    printf("%lld %d died\n", now - table->start_sim, id);
+    pthread_mutex_unlock(&table->print_lock);
+}
 
-	pthread_mutex_lock(&sim->death_lock);
-	if (sim->someone_died)
+int	check_dead(t_sim *table, int i)
+{
+	long		now;
+	long long	last_meal;
+
+	pthread_mutex_lock(&table->philos[i].last_meal);
+	last_meal = table->philos[i].last_meal_time;
+	pthread_mutex_unlock(&table->philos[i].last_meal);
+	now = current_timestamp();
+	if ((long long)now - last_meal >= (long long)table->tt_die)
 	{
-		pthread_mutex_unlock(&sim->death_lock);
-		return (1);
-	}
-	pthread_mutex_unlock(&sim->death_lock);
-	pthread_mutex_lock(&sim->philos[i].meal_count);
-	meals = sim->philos[i].meals_eaten;
-	pthread_mutex_unlock(&sim->philos[i].meal_count);
-	if (sim->eat_count != 0 && meals >= sim->eat_count)
-		return (1);
-	now = current_time_ms();
-	pthread_mutex_lock(&sim->philos[i].last_meal);
-	last_meal = sim->philos[i].last_meal_time;
-	pthread_mutex_unlock(&sim->philos[i].last_meal);
-	if (now - last_meal >= sim->tt_die)
-	{
-		pthread_mutex_lock(&sim->death_lock);
-		if (!sim->someone_died)
+		pthread_mutex_lock(&table->death_lock);
+		if (!table->someone_died)
 		{
-			sim->someone_died = 1;
-			pthread_mutex_unlock(&sim->death_lock);
-			pthread_mutex_lock(&sim->print_lock);
-			printf("%lld %d died\n", now - sim->start_sim,
-			sim->philos[i].philo_id);
-			pthread_mutex_unlock(&sim->print_lock);
+			table->someone_died = 1;
+			pthread_mutex_unlock(&table->death_lock);
+			print_death(table, table->philos[i].philo_id, now);
 		}
 		else
-			pthread_mutex_unlock(&sim->death_lock);
+			pthread_mutex_unlock(&table->death_lock);
 		return (0);
 	}
 	return (1);
 }
 
-static int	check_death(t_sim *sim)
+int	check_full(t_sim *table)
 {
-	int	i;
-
-	i = 0;
-	while (i < sim->philo_count)
+	if (table->eat_count > 0)
 	{
-		if (!philo_has_died(sim, i))
+		pthread_mutex_lock(&table->full_lock);
+		if (table->full_philos == table->philo_count)
+		{
+			pthread_mutex_lock(&table->death_lock);
+			if (!table->someone_died)
+				table->someone_died = 1;
+			pthread_mutex_unlock(&table->death_lock);
+			pthread_mutex_lock(&table->print_lock);
+			printf("All philos are Full\n");
+			pthread_mutex_unlock(&table->print_lock);
+			pthread_mutex_unlock(&table->full_lock);
 			return (0);
-		i++;
+		}
+		pthread_mutex_unlock(&table->full_lock);
 	}
 	return (1);
 }
 
-static int	count_full_philos(t_sim *sim)
+void	*monitor(void *arg)
 {
-	int	i;
-	int	full;
+	int		i;
+	t_sim	*table;
 
-	i = 0;
-	full = 0;
-	while (i < sim->philo_count)
-	{
-		pthread_mutex_lock(&sim->philos[i].meal_count);
-		if (sim->philos[i].meals_eaten >= sim->eat_count)
-			full++;
-		pthread_mutex_unlock(&sim->philos[i].meal_count);
-		i++;
-	}
-	return (full);
-}
-
-static int	check_meal_count(t_sim *sim)
-{
-	int	full;
-
-	if (sim->eat_count == 0)
-		return (0);
-
-	full = count_full_philos(sim);
-	if (full == sim->philo_count)
-	{
-		pthread_mutex_lock(&sim->death_lock);
-		if (!sim->someone_died)
-			sim->someone_died = 1;
-		pthread_mutex_unlock(&sim->death_lock);
-
-		pthread_mutex_lock(&sim->print_lock);
-		printf("Everyone ate required times!\n");
-		pthread_mutex_unlock(&sim->print_lock);
-		return (1);
-	}
-	return (0);
-}
-
-void	*death_monitor(void *data)
-{
-	t_sim	*sim;
-
-	sim = (t_sim *)data;
+	table = (t_sim *)arg;
 	while (1)
 	{
-		if (sim->eat_count != 0 && check_meal_count(sim))
-			return (NULL);
-		if (!check_death(sim))
+		i = 0;
+		while (i < table->philo_count)
+		{
+			if (!check_dead(table, i))
+				return (NULL);
+			i++;
+		}
+		if (!check_full(table))
 			return (NULL);
 		usleep(100);
 	}
+	return (NULL);
 }
-

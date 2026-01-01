@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:49:15 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/13 16:23:07 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:23:38 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,38 +27,59 @@ void	show_usage_error(void)
 	ft_putstr_fd(" - tt_die (ms): max time a philo can go without eating\n", 2);
 	ft_putstr_fd(" - tt_eat (ms): time spent eating\n", 2);
 	ft_putstr_fd(" - tt_sleep (ms): time spent sleeping\n", 2);
-	ft_putstr_fd(" - meals_count: stop when all philos ate this many times\n\n", 2);
+	ft_putstr_fd(" - meals_count: stop when all philos ate this many times\n\n",
+		2);
 	ft_putstr_fd("====================================================\n", 2);
 	ft_putstr_fd("            Simulation aborted. Try again.\n", 2);
 	ft_putstr_fd("====================================================\n", 2);
 }
 
-int	validate_args(int ac, char **av, t_sim *sim)
+int	validate_args(t_sim *table, int ac, char **av)
 {
 	if (!validate_numbers(ac, av))
 		return (0);
-	sim->philo_count = ft_atoi(av[1]);
-	sim->tt_die = ft_atoi(av[2]);
-	sim->tt_eat = ft_atoi(av[3]);
-	sim->tt_sleep = ft_atoi(av[4]);
-	sim->eat_count = 0;
+	table->philo_count = ft_atol(av[1]);
+	table->tt_die = ft_atol(av[2]);
+	table->tt_eat = ft_atol(av[3]);
+	table->tt_sleep = ft_atol(av[4]);
+	table->someone_died = 0;
+	table->full_philos = 0;
 	if (ac == 6)
-		sim->eat_count = ft_atoi(av[5]);
-	sim->someone_died = 0;
+		table->eat_count = ft_atol(av[5]);
+	else
+		table->eat_count = -1;
+	table->forks = ft_calloc(table->philo_count, sizeof(t_mutex));
+	if (!table->forks)
+		return (cleanup_and_error(table, "Malloc Failed\n", 0));
+	if (!setup_aux(table))
+		return (0);
+	table->start_sim = current_timestamp();
 	return (1);
 }
 
 int	main(int ac, char **av)
 {
-	t_sim	sim;
+	t_sim	table;
+	int		i;
 
-	sim.start_sim = current_time_ms();
+	i = -1;
 	if (ac != 5 && ac != 6)
-		return (show_usage_error(), 1);
-	if (!validate_args(ac, av, &sim))
+	{
+		show_usage_error();
 		return (1);
-	if (!init_simulation(&sim))
+	}
+	if (!validate_args(&table, ac, av))
+	{
+		ft_putstr_fd("Error: invalid arguments\n", 2);
 		return (1);
-	cleanup_simulation(&sim, sim.philo_count);
+	}
+	if (!character_creation(&table))
+		return (1);
+	while (++i < table.philo_count)
+	{
+		pthread_create(&table.philos[i].thread_id, NULL, playthrough,
+			&table.philos[i]);
+	}
+	pthread_life(&table);
 	return (0);
 }

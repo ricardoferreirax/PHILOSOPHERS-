@@ -6,93 +6,91 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:59:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/11 15:55:14 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 21:21:37 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static int	init_philos(t_sim *sim, t_philo *philos)
+void pthread_life(t_sim *table)
+{
+    int i;
+
+    pthread_create(&table->death_monitor, NULL, monitor, table);
+    pthread_join(table->death_monitor, NULL);
+
+    i = 0;
+    while (i < table->philo_count)
+    {
+        pthread_join(table->philos[i].thread_id, NULL);
+        i++;
+    }
+
+    i = 0;
+    while (i < table->philo_count)
+    {
+        pthread_mutex_destroy(&table->forks[i]);
+        pthread_mutex_destroy(&table->philos[i].last_meal);
+        pthread_mutex_destroy(&table->philos[i].meal_count);
+        i++;
+    }
+    pthread_mutex_destroy(&table->print_lock);
+    pthread_mutex_destroy(&table->death_lock);
+    pthread_mutex_destroy(&table->full_lock);
+
+    free(table->forks);
+    free(table->philos);
+}
+
+int	setup_aux(t_sim *table)
 {
 	int	i;
 
 	i = 0;
-	while (i < sim->philo_count)
+	while (i < table->philo_count)
 	{
-		if (pthread_mutex_init(&sim->forks[i], NULL) != 0)
+		if (pthread_mutex_init(&table->forks[i], NULL) < 0)
+		{
+			while (i > 0)
+			{
+				pthread_mutex_destroy(&table->forks[i - 1]);
+				i--;
+			}
+			free(table->forks);
 			return (0);
-		philos[i].philo_id = i + 1;
-		philos[i].tt_eat = sim->tt_eat;
-		philos[i].tt_sleep = sim->tt_sleep;
-		philos[i].l_fork = &sim->forks[i];
-		philos[i].r_fork = &sim->forks[(i + 1) % sim->philo_count];
-		philos[i].start_sim = sim->start_sim;
-		philos[i].last_meal_time = sim->start_sim;
-		philos[i].meals_eaten = 0;
-		philos[i].table = sim;
-		if (pthread_mutex_init(&philos[i].last_meal, NULL) != 0)
-			return (0);
-		if (pthread_mutex_init(&philos[i].meal_count, NULL) != 0)
-			return (0);
+		}
 		i++;
 	}
+	if (pthread_mutex_init(&table->print_lock, NULL) < 0)
+		return (cleanup_and_error(table, "Init Failed\n", 1));
+	if (pthread_mutex_init(&table->death_lock, NULL) < 0)
+		return (cleanup_and_error(table, "Init Failed\n", 2));
+	if (pthread_mutex_init(&table->full_lock, NULL) < 0)
+		return (cleanup_and_error(table, "Init Failed\n", 3));
 	return (1);
 }
 
-static int allocate_and_init_structs(t_sim *sim)
+int	character_creation(t_sim *table)
 {
-    t_philo *philo_arr;
+	int	id;
 
-    if (pthread_mutex_init(&sim->print_lock, NULL) != 0)
-        return (0);
-    if (pthread_mutex_init(&sim->death_lock, NULL) != 0)
-        return (pthread_mutex_destroy(&sim->print_lock), 0);
-    sim->forks = malloc(sim->philo_count * sizeof(t_mutex));
-    if (!sim->forks)
-        return (pthread_mutex_destroy(&sim->print_lock),
-		pthread_mutex_destroy(&sim->death_lock), 0);
-    philo_arr = malloc(sim->philo_count * sizeof(t_philo));
-    if (!philo_arr)
-        return (free(sim->forks), pthread_mutex_destroy(&sim->print_lock),
-                pthread_mutex_destroy(&sim->death_lock), 0);
-    if (!init_philos(sim, philo_arr))
-    {
-        free(philo_arr);
-        free(sim->forks);
-        pthread_mutex_destroy(&sim->print_lock);
-        pthread_mutex_destroy(&sim->death_lock);
-        return (0);
-    }
-    sim->philos = philo_arr;
-    return (1);
-}
-
-static int	start_threads(t_sim *sim)
-{
-	int i;
-	int created;
-
-	i = 0;
-	created = 0;
-	while (i < sim->philo_count)
+	table->philos = ft_calloc(table->philo_count, sizeof(t_philo));
+	if (!table->philos)
+		return (cleanup_and_error(table, "Malloc Failed\n", 3));
+	id = 0;
+	while (id < table->philo_count)
 	{
-		if (pthread_create(&sim->philos[i].thread_id, NULL,
-				philo_routine, &sim->philos[i]) != 0)
-			return (cleanup_simulation(sim, created), 0);
-		created++;
-		usleep(100);
-		i++;
+		table->philos[id].philo_id = id + 1;
+		table->philos[id].table = table;
+		table->philos[id].l_fork = &table->forks[id];
+		table->philos[id].r_fork = &table->forks[(id + 1) % table->philo_count];
+		table->philos[id].last_meal_time = table->start_sim;
+		table->philos[id].meals_eaten = 0;
+		if (pthread_mutex_init(&table->philos[id].last_meal, NULL) < 0)
+			return (cleanup_and_error(table, "Init Failed\n", 4));
+		if (pthread_mutex_init(&table->philos[id].meal_count, NULL) < 0)
+			return (cleanup_and_error(table, "Init Failed\n", 5));
+		id++;
 	}
-	if (pthread_create(&sim->death_monitor, NULL, death_monitor, sim) != 0)
-		return (cleanup_simulation(sim, created), 0);
-	return (1);
-}
-
-int	init_simulation(t_sim *sim)
-{
-	if (!allocate_and_init_structs(sim))
-		return (0);
-	if (!start_threads(sim))
-		return (0);
 	return (1);
 }

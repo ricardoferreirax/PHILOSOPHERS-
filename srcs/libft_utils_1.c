@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft_utils.c                                      :+:      :+:    :+:   */
+/*   libft_utils_1.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:27:33 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/11 15:55:27 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2025/12/29 12:29:51 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,23 +29,31 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (((unsigned char *)s1)[i] - ((unsigned char *)s2)[i]);
 }
 
-int	ft_atoi(const char *str)
+long	ft_atol(const char *str)
 {
-	int	res;
-	int	i;
+	int		i;
+	int		sign;
+	long	res;
 
-	res = 0;
 	i = 0;
+	sign = 1;
+	res = 0;
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
-	if (str[i] == '+')
-		i++;
-	while (str[i])
+	if (str[i] == '-' || str[i] == '+')
 	{
-		res = res * 10 + (str[i] - '0');
+		if (str[i] == '-')
+			sign = -sign;
 		i++;
 	}
-	return (res);
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		res = res * 10 + (str[i] - '0');
+		if (res > INT_MAX)
+			return (-1);
+		i++;
+	}
+	return (res * sign);
 }
 
 void	ft_putstr_fd(char *s, int fd)
@@ -57,4 +65,18 @@ void	ft_putstr_fd(char *s, int fd)
 	idx = 0;
 	while (s[idx] != '\0')
 		write(fd, &s[idx++], 1);
+}
+
+void	ft_bzero(void *str, size_t n)
+{
+	size_t			i;
+	unsigned char	*array;
+
+	i = 0;
+	array = (unsigned char *)str;
+	while (i < n)
+	{
+		array[i] = 0;
+		i++;
+	}
 }

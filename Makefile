@@ -11,8 +11,10 @@ SRCS = \
 	srcs/check_death.c \
 	srcs/init_simulation.c \
 	srcs/parsing.c \
+	srcs/cleanup.c \
 	srcs/philo_utils.c \
-	srcs/libft_utils.c \
+	srcs/libft_utils_1.c \
+	srcs/libft_utils_2.c \
 	srcs/philo.c \
 
 OBJS = $(SRCS:.c=.o)
