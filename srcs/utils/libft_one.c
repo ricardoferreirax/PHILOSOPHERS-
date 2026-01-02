@@ -1,20 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft_utils_1.c                                    :+:      :+:    :+:   */
+/*   libft_one.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:27:33 by rmedeiro          #+#    #+#             */
-/*   Updated: 2025/12/29 12:29:51 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:56:55 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../../includes/philo.h"
 
 int	ft_isdigit(int c)
 {
 	return (c >= 48 && c <= 57);
+}
+
+int	ft_isnegative(const char *arg)
+{
+	if (arg[0] == '-')
+	{
+		printf("Error: argument cannot be negative\n");
+		return (0);
+	}
+	return (1);
 }
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
@@ -65,18 +75,4 @@ void	ft_putstr_fd(char *s, int fd)
 	idx = 0;
 	while (s[idx] != '\0')
 		write(fd, &s[idx++], 1);
-}
-
-void	ft_bzero(void *str, size_t n)
-{
-	size_t			i;
-	unsigned char	*array;
-
-	i = 0;
-	array = (unsigned char *)str;
-	while (i < n)
-	{
-		array[i] = 0;
-		i++;
-	}
 }

@@ -6,21 +6,11 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:45:49 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:46:42 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:58:28 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
-
-static int	ft_isnegative(const char *arg)
-{
-	if (arg[0] == '-')
-	{
-		printf("Error: argument cannot be negative\n");
-		return (0);
-	}
-	return (1);
-}
 
 static int	ft_iszero(const char *arg)
 {
@@ -73,7 +63,7 @@ static int	validate_int_limit(const char *str)
 	return (1);
 }
 
-int	validate_numbers(int ac, char **av)
+static int	validate_numbers(int ac, char **av)
 {
 	int	i;
 
@@ -90,5 +80,28 @@ int	validate_numbers(int ac, char **av)
 			return (0);
 		i++;
 	}
+	return (1);
+}
+
+int	validate_args(t_sim *table, int ac, char **av)
+{
+	if (!validate_numbers(ac, av))
+		return (0);
+	table->philo_count = ft_atol(av[1]);
+	table->tt_die = ft_atol(av[2]);
+	table->tt_eat = ft_atol(av[3]);
+	table->tt_sleep = ft_atol(av[4]);
+	table->someone_died = 0;
+	table->full_philos = 0;
+	if (ac == 6)
+		table->eat_count = ft_atol(av[5]);
+	else
+		table->eat_count = -1;
+	table->forks = ft_calloc(table->philo_count, sizeof(t_mutex));
+	if (!table->forks)
+		return (cleanup_and_error(table, "Malloc Failed\n", 0));
+	if (!init_mutexes(table))
+		return (0);
+	table->start_sim = current_timestamp();
 	return (1);
 }

@@ -7,16 +7,16 @@ RM = rm -rf
 INCLUDE = includes
 
 SRCS = \
+	main.c \
 	srcs/philo_routine.c \
 	srcs/check_death.c \
 	srcs/init_philos.c \
 	srcs/philo_forks.c \
 	srcs/parsing.c \
-	srcs/cleanup.c \
-	srcs/philo_utils.c \
-	srcs/libft_utils_1.c \
-	srcs/libft_utils_2.c \
-	srcs/philo.c \
+	srcs/utils/cleanup.c \
+	srcs/utils/philo_utils.c \
+	srcs/utils/libft_one.c \
+	srcs/utils/libft_two.c \
 
 OBJS = $(SRCS:.c=.o)
 

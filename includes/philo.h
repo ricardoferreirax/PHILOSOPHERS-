@@ -6,7 +6,7 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 12:51:12 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:57:11 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/02 12:09:59 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,13 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <unistd.h>
+
+# define CLR_RESET "\033[0m"
+
+# define CLR_FORK "\033[33m"
+# define CLR_EAT "\033[32m"
+# define CLR_SLEEP "\033[34m"
+# define CLR_THINK "\033[36m"
 
 typedef pthread_mutex_t	t_mutex;
 
@@ -64,21 +71,24 @@ void					philo_print_state(t_philo *philo, char *s);
 int						init_philos(t_sim *table);
 int						init_mutexes(t_sim *table);
 void					end_simulation(t_sim *table);
-void					*monitor(void *arg);
+void					print_philo_death(t_sim *table, int id, long now);
+void					philo_print_state(t_philo *philo, char *s);
+void					*monitor_routine(void *arg);
+void					show_usage_error(void);
 
 int						pick_forks_even(t_philo *philo);
 int						pick_forks_odd(t_philo *philo);
 void					unlock_forks_odd(t_philo *philo);
 void					unlock_forks_even(t_philo *philo);
 
-int						validate_numbers(int ac, char **av);
+int						validate_args(t_sim *table, int ac, char **av);
 
 int						ft_isdigit(int c);
 int						ft_strncmp(const char *s1, const char *s2, size_t n);
 long					ft_atol(const char *str);
 void					ft_putstr_fd(char *s, int fd);
 void					ft_bzero(void *str, size_t n);
-void					*ft_memset(void *s, int c, size_t n);
 void					*ft_calloc(size_t nmemb, size_t size);
+int						ft_isnegative(const char *arg);
 
 #endif

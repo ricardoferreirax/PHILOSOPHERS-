@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/13 12:49:15 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:56:22 by rmedeiro         ###   ########.fr       */
+/*   Created: 2025/11/14 15:44:44 by rmedeiro          #+#    #+#             */
+/*   Updated: 2026/01/02 12:09:24 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../../includes/philo.h"
 
 void	show_usage_error(void)
 {
@@ -34,53 +34,65 @@ void	show_usage_error(void)
 	ft_putstr_fd("====================================================\n", 2);
 }
 
-int	validate_args(t_sim *table, int ac, char **av)
+long	current_timestamp(void)
 {
-	if (!validate_numbers(ac, av))
-		return (0);
-	table->philo_count = ft_atol(av[1]);
-	table->tt_die = ft_atol(av[2]);
-	table->tt_eat = ft_atol(av[3]);
-	table->tt_sleep = ft_atol(av[4]);
-	table->someone_died = 0;
-	table->full_philos = 0;
-	if (ac == 6)
-		table->eat_count = ft_atol(av[5]);
-	else
-		table->eat_count = -1;
-	table->forks = ft_calloc(table->philo_count, sizeof(t_mutex));
-	if (!table->forks)
-		return (cleanup_and_error(table, "Malloc Failed\n", 0));
-	if (!init_mutexes(table))
-		return (0);
-	table->start_sim = current_timestamp();
-	return (1);
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-int	main(int ac, char **av)
+void	philo_usleep(long duration, t_sim *table)
 {
-	t_sim	table;
-	int		i;
+	long long	start;
 
-	if (ac != 5 && ac != 6)
+	if (duration <= 0)
+		return ;
+	start = current_timestamp();
+	while ((current_timestamp() - start) < duration)
 	{
-		show_usage_error();
-		return (1);
+		pthread_mutex_lock(&table->death_lock);
+		if (table->someone_died)
+		{
+			pthread_mutex_unlock(&table->death_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&table->death_lock);
+		usleep(100);
 	}
-	if (!validate_args(&table, ac, av))
+}
+
+void	print_philo_death(t_sim *table, int id, long now)
+{
+	pthread_mutex_lock(&table->print_lock);
+	printf("%lld %d died\n", now - table->start_sim, id);
+	pthread_mutex_unlock(&table->print_lock);
+}
+
+void	philo_print_state(t_philo *philo, char *msg)
+{
+	long	time;
+	char	*color;
+
+	color = CLR_RESET;
+	if (!ft_strncmp(msg, "has taken a fork", 17))
+		color = CLR_FORK;
+	else if (!ft_strncmp(msg, "is eating", 9))
+		color = CLR_EAT;
+	else if (!ft_strncmp(msg, "is sleeping", 11))
+		color = CLR_SLEEP;
+	else if (!ft_strncmp(msg, "is thinking", 11))
+		color = CLR_THINK;
+	pthread_mutex_lock(&philo->table->death_lock);
+	pthread_mutex_lock(&philo->table->print_lock);
+	if (philo->table->someone_died)
 	{
-		ft_putstr_fd("Error: invalid arguments\n", 2);
-		return (1);
+		pthread_mutex_unlock(&philo->table->death_lock);
+		pthread_mutex_unlock(&philo->table->print_lock);
+		return ;
 	}
-	if (!init_philos(&table))
-		return (1);
-	i = 0;
-	while (i < table.philo_count)
-	{
-		pthread_create(&table.philos[i].thread_id, NULL, philo_routine,
-			&table.philos[i]);
-		i++;
-	}
-	end_simulation(&table);
-	return (0);
+	pthread_mutex_unlock(&philo->table->death_lock);
+	time = current_timestamp() - philo->table->start_sim;
+	printf("%s%ld %d %s%s\n", color, time, philo->philo_id, msg, CLR_RESET);
+	pthread_mutex_unlock(&philo->table->print_lock);
 }

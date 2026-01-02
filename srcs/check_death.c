@@ -6,20 +6,13 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:04:07 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:02:41 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 22:07:05 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void print_death(t_sim *table, int id, long now)
-{
-    pthread_mutex_lock(&table->print_lock);
-    printf("%lld %d died\n", now - table->start_sim, id);
-    pthread_mutex_unlock(&table->print_lock);
-}
-
-int	check_dead(t_sim *table, int i)
+static int	check_philo_death(t_sim *table, int i)
 {
 	long		now;
 	long long	last_meal;
@@ -35,7 +28,7 @@ int	check_dead(t_sim *table, int i)
 		{
 			table->someone_died = 1;
 			pthread_mutex_unlock(&table->death_lock);
-			print_death(table, table->philos[i].philo_id, now);
+			print_philo_death(table, table->philos[i].philo_id, now);
 		}
 		else
 			pthread_mutex_unlock(&table->death_lock);
@@ -44,7 +37,7 @@ int	check_dead(t_sim *table, int i)
 	return (1);
 }
 
-int	check_full(t_sim *table)
+static int	check_all_philos_full(t_sim *table)
 {
 	if (table->eat_count > 0)
 	{
@@ -56,7 +49,7 @@ int	check_full(t_sim *table)
 				table->someone_died = 1;
 			pthread_mutex_unlock(&table->death_lock);
 			pthread_mutex_lock(&table->print_lock);
-			printf("All philos are Full\n");
+			printf("All philos have eaten the required number of meals\n");
 			pthread_mutex_unlock(&table->print_lock);
 			pthread_mutex_unlock(&table->full_lock);
 			return (0);
@@ -66,7 +59,7 @@ int	check_full(t_sim *table)
 	return (1);
 }
 
-void	*monitor(void *arg)
+void	*monitor_routine(void *arg)
 {
 	int		i;
 	t_sim	*table;
@@ -77,11 +70,11 @@ void	*monitor(void *arg)
 		i = 0;
 		while (i < table->philo_count)
 		{
-			if (!check_dead(table, i))
+			if (!check_philo_death(table, i))
 				return (NULL);
 			i++;
 		}
-		if (!check_full(table))
+		if (!check_all_philos_full(table))
 			return (NULL);
 		usleep(100);
 	}

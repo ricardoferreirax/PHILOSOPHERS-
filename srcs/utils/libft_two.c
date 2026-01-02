@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft_utils_2.c                                    :+:      :+:    :+:   */
+/*   libft_two.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 12:29:57 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:03:54 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:57:08 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../../includes/philo.h"
 
-void	*ft_memset(void *s, int c, size_t n)
+static void	*ft_memset(void *s, int c, size_t n)
 {
 	size_t			idx;
 	unsigned char	*tmp_s;
@@ -37,4 +37,18 @@ void	*ft_calloc(size_t nmemb, size_t size)
 		return (NULL);
 	ft_memset(buffer, 0, nmemb * size);
 	return (buffer);
+}
+
+void	ft_bzero(void *str, size_t n)
+{
+	size_t			i;
+	unsigned char	*array;
+
+	i = 0;
+	array = (unsigned char *)str;
+	while (i < n)
+	{
+		array[i] = 0;
+		i++;
+	}
 }

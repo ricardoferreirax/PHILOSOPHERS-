@@ -6,29 +6,11 @@
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:48:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:44:45 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 22:07:24 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
-
-void	philo_print_state(t_philo *philo, char *s)
-{
-	long	time;
-
-	pthread_mutex_lock(&philo->table->death_lock);
-	pthread_mutex_lock(&philo->table->print_lock);
-	if (philo->table->someone_died)
-	{
-		pthread_mutex_unlock(&philo->table->death_lock);
-		pthread_mutex_unlock(&philo->table->print_lock);
-		return ;
-	}
-	pthread_mutex_unlock(&philo->table->death_lock);
-	time = current_timestamp() - philo->table->start_sim;
-	printf("%ld %d %s\n", time, philo->philo_id, s);
-	pthread_mutex_unlock(&philo->table->print_lock);
-}
 
 int	philo_pick_forks(t_philo *philo)
 {

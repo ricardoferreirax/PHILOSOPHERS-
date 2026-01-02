@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_simulation.c                                  :+:      :+:    :+:   */
+/*   init_philos.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rmedeiro <rmedeiro@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:59:25 by rmedeiro          #+#    #+#             */
-/*   Updated: 2026/01/01 21:52:42 by rmedeiro         ###   ########.fr       */
+/*   Updated: 2026/01/01 22:08:44 by rmedeiro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	end_simulation(t_sim *table)
 {
 	int	i;
 
-	pthread_create(&table->death_monitor, NULL, monitor, table);
+	pthread_create(&table->death_monitor, NULL, monitor_routine, table);
 	pthread_join(table->death_monitor, NULL);
 	i = 0;
 	while (i < table->philo_count)
